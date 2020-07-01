@@ -1,0 +1,13 @@
+C:\Users\Requi\Documents\Integer-To-English-Word\bin\Debug\netcoreapp3.1\Integer-To-English-Word.exe
+C:\Users\Requi\Documents\Integer-To-English-Word\bin\Debug\netcoreapp3.1\Integer-To-English-Word.deps.json
+C:\Users\Requi\Documents\Integer-To-English-Word\bin\Debug\netcoreapp3.1\Integer-To-English-Word.runtimeconfig.json
+C:\Users\Requi\Documents\Integer-To-English-Word\bin\Debug\netcoreapp3.1\Integer-To-English-Word.runtimeconfig.dev.json
+C:\Users\Requi\Documents\Integer-To-English-Word\bin\Debug\netcoreapp3.1\Integer-To-English-Word.dll
+C:\Users\Requi\Documents\Integer-To-English-Word\bin\Debug\netcoreapp3.1\Integer-To-English-Word.pdb
+C:\Users\Requi\Documents\Integer-To-English-Word\obj\Debug\netcoreapp3.1\Integer-To-English-Word.csprojAssemblyReference.cache
+C:\Users\Requi\Documents\Integer-To-English-Word\obj\Debug\netcoreapp3.1\Integer-To-English-Word.csproj.CoreCompileInputs.cache
+C:\Users\Requi\Documents\Integer-To-English-Word\obj\Debug\netcoreapp3.1\Integer-To-English-Word.AssemblyInfoInputs.cache
+C:\Users\Requi\Documents\Integer-To-English-Word\obj\Debug\netcoreapp3.1\Integer-To-English-Word.AssemblyInfo.cs
+C:\Users\Requi\Documents\Integer-To-English-Word\obj\Debug\netcoreapp3.1\Integer-To-English-Word.dll
+C:\Users\Requi\Documents\Integer-To-English-Word\obj\Debug\netcoreapp3.1\Integer-To-English-Word.pdb
+C:\Users\Requi\Documents\Integer-To-English-Word\obj\Debug\netcoreapp3.1\Integer-To-English-Word.genruntimeconfig.cache
