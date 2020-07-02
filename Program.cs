@@ -5,6 +5,7 @@ Note: Program designed with the SOLID principles of object-oriented programming 
 */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 
@@ -14,6 +15,11 @@ namespace Integer_To_English_Word
     {
         static void Main(string[] args)
         {
+            Int32 userNumber = IsValidInput(args);
+            StandardDictionaryNumbers numberLibrary = new StandardDictionaryNumbers(userNumber);
+            
+
+            /*
             if (IsValidInput(args))
             {
                 string number = args[0];
@@ -49,11 +55,13 @@ namespace Integer_To_English_Word
                     Console.Write(item);
                 }
             }
+            */
         }
 
         // A function which will exit the program and inform the user if there are too many
-        // command line arguments or if a non-number is given. 
-        private static bool IsValidInput(string[] arguments)
+        // command line arguments or if a non 32-bit signed number is given. The limits are
+        // from -2,147,483,648 to 2,147,483,647.
+        private static Int32 IsValidInput(string[] arguments)
         {
             if (arguments.Length != 1)
             {
@@ -61,29 +69,251 @@ namespace Integer_To_English_Word
                 System.Environment.Exit(0);
             }
 
-            for (int i = 0; i < arguments[0].Length; i++)
+            if (!Int32.TryParse(arguments[0], out Int32 number))
             {
-                char chara = arguments[0][i];
-
-                if (i == 0 && (!Char.Equals(chara, '-') && !Char.IsNumber(chara)))
-                {
-                    Console.WriteLine("Please supply only integers (0-9) with or without the negative sign (-) in your command line argument. Try again.");
-                    System.Environment.Exit(0);
-                }
-                else if (i != 0 && !Char.IsNumber(chara))
-                {
-                    Console.WriteLine("Please supply only integers (0-9) with or without the negative sign (-) in your command line argument. Try again.");
-                    System.Environment.Exit(0);
-                }
+                Console.WriteLine("Please supply only signed 32-bit integers with or without the negative sign (-) in your command line argument. Try again.");
+                System.Environment.Exit(0);
             }
 
-            return true;
+            return number;
         }
     }
 
     class StandardDictionaryNumbers
     {
-        /*
+        List<string> englishNumber = new List<string>(); 
+
+        Dictionary<int, string> hundredsDictionary = new Dictionary<int, string> {
+            {3, "hundred"}, {6, "thousand"}, {9, "million"}, {12, "billion"}
+        };
+
+        Dictionary<int, string> tensDictionary = new Dictionary<int, string> {
+            {2, "twenty"}, {3, "thirty"}, {4, "forty"}, {5, "fifty"}, 
+            {6, "sixty"}, {7, "seventy"}, {8, "eighty"}, {9, "ninety"}
+        };
+
+        Dictionary<int, string> numberDictionary = new Dictionary<int, string> {
+            {0, "zero"}, {1, "one"}, {2, "two"}, {3, "three"}, {4, "four"}, 
+            {5, "five"}, {6, "six"}, {7, "seven"}, {8, "eight"}, {9, "nine"}
+        };
+
+        Dictionary<int, string> specialNumberDictionary = new Dictionary<int, string> {
+            {10, "ten"}, {11, "eleven"}, {12, "twelve"}, {13, "thirteen"}, {14, "fourteen"}, 
+            {15, "fifteen"}, {16, "sixteen"}, {17, "seventeen"}, {18, "eighteen"}, {19, "nineteen"}
+        };
+
+        public StandardDictionaryNumbers(Int32 signedNumber)
+        {
+            char[] numberReversed = signedNumber.ToString().ToCharArray().Reverse().ToArray();
+            int isNegative = Math.Sign(signedNumber);
+            int numberLength = isNegative >= 0 ? signedNumber.ToString().Length : signedNumber.ToString().Length - 1;
+
+
+            // Stores the english equvalent of a one digit number.
+            if (numberLength == 1)
+            {
+                for (int i = 0; i < signedNumber.ToString().Length; i++)
+                {
+                    if (numberReversed[i].Equals('-'))
+                    {
+                        englishNumber.Add("negative ");
+
+                        continue;
+                    }
+
+                    englishNumber.Add(oneDigitNumberToEnglish(Int32.Parse(numberReversed[i].ToString())) + " ");
+                }
+
+                foreach (var item in englishNumber)
+                {
+                    Console.WriteLine(item);
+                }
+            }
+            // Stores the english equivalent of a two digit number.
+            else if (numberLength == 2)
+            {
+                for (int i = 0; i < signedNumber.ToString().Length; i++)
+                {
+                    if (numberReversed[i].Equals('-'))
+                    {
+                        englishNumber.Add("negative ");
+
+                        continue;
+                    }
+
+                    if ((i + 1) % 2 == 0)
+                    {
+                        Int32 onesDigit = Int32.Parse(numberReversed[i - 1].ToString());
+                        Int32 tensDigit = Int32.Parse(numberReversed[i].ToString());
+                        
+
+                        if (tensDigit > 1)
+                        {
+                            if (onesDigit > 0)
+                            {
+                                englishNumber.Add(oneDigitNumberToEnglish(onesDigit) + " ");    
+                            }
+
+                            englishNumber.Add(tensDigitNumberToEnglish(tensDigit) + " ");    
+                        }
+                        else if (tensDigit == 1)
+                        {
+                            Int32 value = Int32.Parse(string.Concat(tensDigit.ToString(), onesDigit.ToString()));
+
+                            englishNumber.Add(outlierTensDigitNumberToEnglish(value) + " ");
+                        }
+                    }
+                }
+
+                foreach (var item in englishNumber)
+                {
+                    Console.WriteLine(item);
+                }
+            }
+            // Stores the english equivalent of all other numbers.
+            else
+            {
+                for (int i = 0; i < signedNumber.ToString().Length; i++)
+                {
+                    if (numberReversed[i].Equals('-'))
+                    {
+                        englishNumber.Add("negative ");
+
+                        continue;
+                    }
+
+                    // Every third number, we create the english equivalent of that 
+                    // portion of the overall number. 
+                    if ((i + 1) % 3 == 0)
+                    {
+                        Int32 onesDigit = Int32.Parse(numberReversed[i - 2].ToString());
+                        Int32 tensDigit = Int32.Parse(numberReversed[i - 1].ToString());
+                        Int32 hundredsDigit = Int32.Parse(numberReversed[i].ToString());
+
+                        //Console.WriteLine(hundredsDictionary[i + 1]);
+
+                        if (i != 2)
+                        {
+                            englishNumber.Add(hundredsDictionary[i + 1]);
+                        }
+
+                        if (tensDigit > 1)
+                        {
+                            if (onesDigit > 0)
+                            {
+                                englishNumber.Add(oneDigitNumberToEnglish(onesDigit) + " ");    
+                            }
+
+                            englishNumber.Add(tensDigitNumberToEnglish(tensDigit));
+                        }
+                        else if (tensDigit == 1)
+                        {
+                            Int32 value = Int32.Parse(string.Concat(tensDigit.ToString(), onesDigit.ToString()));
+
+                            englishNumber.Add(outlierTensDigitNumberToEnglish(value) + " ");
+                        }
+
+                        if (hundredsDigit > 0)
+                        {
+                            englishNumber.Add(oneDigitNumberToEnglish(hundredsDigit) + " " + hundredsDictionary[3] + " ");
+
+                            //Console.WriteLine("i is: " + i);
+                        }
+
+
+                        //Console.WriteLine(numberReversed[i]);
+                        //Console.WriteLine(hundredsDictionary[i + 1]);
+                    }
+                }
+
+                foreach (var item in englishNumber)
+                {
+                    Console.WriteLine(item);
+                }
+            }
+            
+
+
+            /*
+            char[] numberStringReversed = signedNumber.ToString().ToCharArray().Reverse().ToArray();
+
+            for (int i = 0; i < numberStringReversed.Length; i++)
+            {                
+                if (numberStringReversed[i].Equals('-'))
+                {
+                    continue;
+                }
+
+                if ((i + 1) % 3 == 0)
+                {
+                    int hundredsDigit = Int32.Parse(numberStringReversed[i].ToString());
+                    int tensDigit = Int32.Parse(numberStringReversed[i - 1].ToString());
+                    int onesDigit = Int32.Parse(numberStringReversed[i - 2].ToString());
+                    string numberInEnglish = "";
+
+                    if (hundredsDigit != 0)
+                    {
+                       numberInEnglish = String.Concat(hundredsDigit + " " + hundredsDictionary[3]);
+                    }
+
+
+
+                    Console.WriteLine(numberInEnglish);
+
+
+                    
+                    if (hundredsDigit == 0)
+                    {
+                        string tensPlaceNumber = "";
+                        string onesPlaceNumber = "";
+
+                        if (tensDigit != 0)
+                        {
+                            tensPlaceNumber = tensDigitNumberToEnglish(tensDigit) + " ";    
+                            onesPlaceNumber = tensDigitNumberToEnglish(onesDigit) + " ";    
+                        }
+                        else if (tensDigit == 0)
+                        {
+                            onesPlaceNumber = oneDigitNumberToEnglish(onesDigit) + " ";
+                        }
+                        
+
+                        Console.WriteLine(tensPlaceNumber + onesPlaceNumber);
+                    }
+                    
+                    
+
+                    
+                    //string hundredsPlaceNumber = oneDigitNumberToEnglish(Int32.Parse(numberStringReversed[i].ToString())) + " " + hundredsDictionary[3] + " ";
+                    //string tensPlaceNumber = tensDigitNumberToEnglish(Int32.Parse(numberStringReversed[i - 1].ToString())) + " ";
+                    //string onesPlaceNumber = oneDigitNumberToEnglish(Int32.Parse(numberStringReversed[i - 2].ToString())) + " ";
+
+                    //Console.Write(hundredsPlaceNumber + tensPlaceNumber + onesPlaceNumber);   
+                }  
+            }
+            */
+        }
+
+        private string oneDigitNumberToEnglish(Int32 digit)
+        {
+            return numberDictionary[digit];
+        }
+
+        private string tensDigitNumberToEnglish(Int32 digit)
+        {
+            return tensDictionary[digit];
+        }
+
+        private string outlierTensDigitNumberToEnglish(Int32 digit)
+        {
+            return specialNumberDictionary[digit];
+        }
+    }
+
+    /*
+    class StandardDictionaryNumbers
+    {
+        
         private string[] placeValue = { 
                                         "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety", "hundred",
                                         "thousand", "million", "billion", "trillion", "quadrillion", "quintillion", 
@@ -91,7 +321,7 @@ namespace Integer_To_English_Word
                                         "duodecillion", "tredecillion", "quattuordecillion", "quindecillion", "sexdecillion", "septendecillion", 
                                         "octodecillion", "novemdecillion", "vigintillion", "centillion"
         };
-        */
+        
         char tensPlaceValue = ' ';
         public bool isNegative = false;
 
@@ -166,5 +396,8 @@ namespace Integer_To_English_Word
 
             return "";
         }
+        
     }
+    */
+    
 }
