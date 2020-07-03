@@ -104,209 +104,115 @@ namespace Integer_To_English_Word
 
         public StandardDictionaryNumbers(Int32 signedNumber)
         {
-            char[] numberReversed = signedNumber.ToString().ToCharArray().Reverse().ToArray();
-            int isNegative = Math.Sign(signedNumber);
-            int numberLength = isNegative >= 0 ? signedNumber.ToString().Length : signedNumber.ToString().Length - 1;
+            string numberStringReversed = new string(signedNumber.ToString().ToCharArray().Reverse().ToArray());
+            int sign = Math.Sign(signedNumber);
+            int numberLength = sign >= 0 ? signedNumber.ToString().Length : signedNumber.ToString().Length - 1;
 
 
-            // Stores the english equvalent of a one digit number.
-            if (numberLength == 1)
+            // Formats the reversed number string such that its length becomes a multiple of 3.
+            formatNumberLength(ref numberStringReversed, sign, ref numberLength);
+
+            for (int i = 0; i < numberLength; i++)
             {
-                for (int i = 0; i < signedNumber.ToString().Length; i++)
+                if (signedNumber == 0)
                 {
-                    if (numberReversed[i].Equals('-'))
-                    {
-                        englishNumber.Add("negative ");
+                    englishNumber.Add(numberDictionary[0]);
 
-                        continue;
-                    }
-
-                    englishNumber.Add(oneDigitNumberToEnglish(Int32.Parse(numberReversed[i].ToString())) + " ");
+                    break;
                 }
 
-                foreach (var item in englishNumber)
-                {
-                    Console.WriteLine(item);
-                }
-            }
-            // Stores the english equivalent of a two digit number.
-            else if (numberLength == 2)
-            {
-                for (int i = 0; i < signedNumber.ToString().Length; i++)
-                {
-                    if (numberReversed[i].Equals('-'))
-                    {
-                        englishNumber.Add("negative ");
-
-                        continue;
-                    }
-
-                    if ((i + 1) % 2 == 0)
-                    {
-                        Int32 onesDigit = Int32.Parse(numberReversed[i - 1].ToString());
-                        Int32 tensDigit = Int32.Parse(numberReversed[i].ToString());
-                        
-
-                        if (tensDigit > 1)
-                        {
-                            if (onesDigit > 0)
-                            {
-                                englishNumber.Add(oneDigitNumberToEnglish(onesDigit) + " ");    
-                            }
-
-                            englishNumber.Add(tensDigitNumberToEnglish(tensDigit) + " ");    
-                        }
-                        else if (tensDigit == 1)
-                        {
-                            Int32 value = Int32.Parse(string.Concat(tensDigit.ToString(), onesDigit.ToString()));
-
-                            englishNumber.Add(outlierTensDigitNumberToEnglish(value) + " ");
-                        }
-                    }
-                }
-
-                foreach (var item in englishNumber)
-                {
-                    Console.WriteLine(item);
-                }
-            }
-            // Stores the english equivalent of all other numbers.
-            else
-            {
-                for (int i = 0; i < signedNumber.ToString().Length; i++)
-                {
-                    if (numberReversed[i].Equals('-'))
-                    {
-                        englishNumber.Add("negative ");
-
-                        continue;
-                    }
-
-                    // Every third number, we create the english equivalent of that 
-                    // portion of the overall number. 
-                    if ((i + 1) % 3 == 0)
-                    {
-                        Int32 onesDigit = Int32.Parse(numberReversed[i - 2].ToString());
-                        Int32 tensDigit = Int32.Parse(numberReversed[i - 1].ToString());
-                        Int32 hundredsDigit = Int32.Parse(numberReversed[i].ToString());
-
-                        //Console.WriteLine(hundredsDictionary[i + 1]);
-
-                        if (i != 2)
-                        {
-                            englishNumber.Add(hundredsDictionary[i + 1]);
-                        }
-
-                        if (tensDigit > 1)
-                        {
-                            if (onesDigit > 0)
-                            {
-                                englishNumber.Add(oneDigitNumberToEnglish(onesDigit) + " ");    
-                            }
-
-                            englishNumber.Add(tensDigitNumberToEnglish(tensDigit));
-                        }
-                        else if (tensDigit == 1)
-                        {
-                            Int32 value = Int32.Parse(string.Concat(tensDigit.ToString(), onesDigit.ToString()));
-
-                            englishNumber.Add(outlierTensDigitNumberToEnglish(value) + " ");
-                        }
-
-                        if (hundredsDigit > 0)
-                        {
-                            englishNumber.Add(oneDigitNumberToEnglish(hundredsDigit) + " " + hundredsDictionary[3] + " ");
-
-                            //Console.WriteLine("i is: " + i);
-                        }
-
-
-                        //Console.WriteLine(numberReversed[i]);
-                        //Console.WriteLine(hundredsDictionary[i + 1]);
-                    }
-                }
-
-                foreach (var item in englishNumber)
-                {
-                    Console.WriteLine(item);
-                }
-            }
-            
-
-
-            /*
-            char[] numberStringReversed = signedNumber.ToString().ToCharArray().Reverse().ToArray();
-
-            for (int i = 0; i < numberStringReversed.Length; i++)
-            {                
-                if (numberStringReversed[i].Equals('-'))
-                {
-                    continue;
-                }
-
+                // Every third number, we create the english equivalent of that 
+                // portion of the overall number. 
                 if ((i + 1) % 3 == 0)
                 {
-                    int hundredsDigit = Int32.Parse(numberStringReversed[i].ToString());
-                    int tensDigit = Int32.Parse(numberStringReversed[i - 1].ToString());
-                    int onesDigit = Int32.Parse(numberStringReversed[i - 2].ToString());
-                    string numberInEnglish = "";
+                    Int32 onesDigit = Int32.Parse(numberStringReversed[i - 2].ToString());
+                    Int32 tensDigit = Int32.Parse(numberStringReversed[i - 1].ToString());
+                    Int32 hundredsDigit = Int32.Parse(numberStringReversed[i].ToString());
 
-                    if (hundredsDigit != 0)
+
+                    if (onesDigit != 0 || tensDigit != 0 || hundredsDigit != 0)
                     {
-                       numberInEnglish = String.Concat(hundredsDigit + " " + hundredsDictionary[3]);
+                        addPlaceValue(i);
                     }
 
-
-
-                    Console.WriteLine(numberInEnglish);
-
-
-                    
-                    if (hundredsDigit == 0)
+                    if (hundredsDigit > 0)
                     {
-                        string tensPlaceNumber = "";
-                        string onesPlaceNumber = "";
+                        createDoubleDigitNumber(onesDigit, tensDigit);
 
-                        if (tensDigit != 0)
-                        {
-                            tensPlaceNumber = tensDigitNumberToEnglish(tensDigit) + " ";    
-                            onesPlaceNumber = tensDigitNumberToEnglish(onesDigit) + " ";    
-                        }
-                        else if (tensDigit == 0)
-                        {
-                            onesPlaceNumber = oneDigitNumberToEnglish(onesDigit) + " ";
-                        }
-                        
+                        englishNumber.Add(hundredsDictionary[3]);
 
-                        Console.WriteLine(tensPlaceNumber + onesPlaceNumber);
+                        englishNumber.Add(numberDictionary[hundredsDigit]);
+
                     }
-                    
-                    
-
-                    
-                    //string hundredsPlaceNumber = oneDigitNumberToEnglish(Int32.Parse(numberStringReversed[i].ToString())) + " " + hundredsDictionary[3] + " ";
-                    //string tensPlaceNumber = tensDigitNumberToEnglish(Int32.Parse(numberStringReversed[i - 1].ToString())) + " ";
-                    //string onesPlaceNumber = oneDigitNumberToEnglish(Int32.Parse(numberStringReversed[i - 2].ToString())) + " ";
-
-                    //Console.Write(hundredsPlaceNumber + tensPlaceNumber + onesPlaceNumber);   
-                }  
+                    else if (hundredsDigit == 0)
+                    {
+                        createDoubleDigitNumber(onesDigit, tensDigit);
+                    }
+                }
             }
-            */
+
+            isNegative(sign);
+
+            foreach (var item in englishNumber)
+            {
+                Console.WriteLine(item);
+            }
         }
 
-        private string oneDigitNumberToEnglish(Int32 digit)
+        private void isNegative(int sign)
         {
-            return numberDictionary[digit];
+            if (sign < 0)
+            {
+                englishNumber.Add("negative ");
+            }
         }
 
-        private string tensDigitNumberToEnglish(Int32 digit)
+        private void createDoubleDigitNumber(int onesDigit, int tensDigit)
         {
-            return tensDictionary[digit];
+            if (tensDigit > 1)
+            {
+                if (onesDigit > 0)
+                {
+                    englishNumber.Add(numberDictionary[onesDigit]);
+                }
+
+                englishNumber.Add(tensDictionary[tensDigit]);
+            }
+            else if (tensDigit == 1)
+            {
+                Int32 num = Int32.Parse(tensDigit.ToString() + onesDigit.ToString());
+
+                englishNumber.Add(specialNumberDictionary[num]);
+            }
+            else if (tensDigit == 0)
+            {
+                englishNumber.Add(numberDictionary[onesDigit]);
+            }
         }
 
-        private string outlierTensDigitNumberToEnglish(Int32 digit)
+        private static void formatNumberLength(ref string numberStringReversed, int sign, ref int numberLength)
         {
-            return specialNumberDictionary[digit];
+            while (numberLength % 3 != 0)
+            {
+                if (sign >= 0)
+                {
+                    numberStringReversed = numberStringReversed.Insert(numberStringReversed.Length, "0");
+                    numberLength = numberStringReversed.Length;
+                }
+                else if (sign < 0)
+                {
+                    numberStringReversed = numberStringReversed.Insert(numberStringReversed.Length - 1, "0");
+                    numberLength = numberStringReversed.Length - 1;
+                }
+            }
+        }
+
+        private void addPlaceValue(int i)
+        {
+            if (i != 2)
+            {
+                englishNumber.Add(hundredsDictionary[i + 1]);
+            }
         }
     }
 
