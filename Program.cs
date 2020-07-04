@@ -15,52 +15,36 @@ namespace Integer_To_English_Word
     {
         static void Main(string[] args)
         {
+            // If the number is not a signed 32 bit integer, or if 
+            // the user has provided too many arguments, inform them
+            // and exit the program.
             Int32 userNumber = IsValidInput(args);
-            StandardDictionaryNumbers numberLibrary = new StandardDictionaryNumbers(userNumber);
+
+            // Determine whether the user's number is a negative or postive number 
+            // and adjust length accordingly.
+            int sign = Math.Sign(userNumber);
+            int numberLength = sign >= 0 ? userNumber.ToString().Length : userNumber.ToString().Length - 1;
+
+            // Reverses the user's number and make its length a multiple of 3 in
+            // order to convert the number to english.
+            NumberFormatter formatter = new NumberFormatter();
+            string reverseString = formatter.reverseNumber(userNumber);
+
+            formatter.formatNumberLength(ref reverseString, sign, ref numberLength);
+
+            // Converts the number to english and displays the result.
+            StandardDictionaryNumbers numberLibrary = new StandardDictionaryNumbers(reverseString, sign, numberLength, userNumber);
             
-
-            /*
-            if (IsValidInput(args))
-            {
-                string number = args[0];
-                List<string> englishNumber = new List<String>();
-                StandardDictionaryNumbers numberLibrary = new StandardDictionaryNumbers();
-
-
-                for (int i = 0; i < number.Length; i++)
-                {
-                    char digit = number[i];
-
-                    if (digit.Equals('-'))
-                    {
-                        englishNumber.Add("negative ");
-
-                        numberLibrary.isNegative = true;
-                        
-                        continue;
-                    }
-                    else
-                    {
-                        string numberFragment = numberLibrary.numberToEnglish(i, number.Length, digit);
-
-                        if (!numberFragment.Equals(""))
-                        {
-                            englishNumber.Add(numberFragment + " ");   
-                        }
-                    }
-                }                
-
-                foreach (var item in englishNumber)
-                {
-                    Console.Write(item);
-                }
-            }
-            */
+            numberLibrary.displayEnglishNumber();
         }
-
+        
         // A function which will exit the program and inform the user if there are too many
         // command line arguments or if a non 32-bit signed number is given. The limits are
         // from -2,147,483,648 to 2,147,483,647.
+        
+        //  Name:
+        //  Purpose:
+        //  Description:
         private static Int32 IsValidInput(string[] arguments)
         {
             if (arguments.Length != 1)
@@ -76,6 +60,37 @@ namespace Integer_To_English_Word
             }
 
             return number;
+        }
+    }
+
+    class NumberFormatter
+    {
+        //  Name:
+        //  Purpose:
+        //  Description:
+        public void formatNumberLength(ref string numberStringReversed, int sign, ref int numberLength)
+        {
+            while (numberLength % 3 != 0)
+            {
+                if (sign >= 0)
+                {
+                    numberStringReversed = numberStringReversed.Insert(numberStringReversed.Length, "0");
+                    numberLength = numberStringReversed.Length;
+                }
+                else if (sign < 0)
+                {
+                    numberStringReversed = numberStringReversed.Insert(numberStringReversed.Length - 1, "0");
+                    numberLength = numberStringReversed.Length - 1;
+                }
+            }
+        }
+
+        //  Name:
+        //  Purpose:
+        //  Description:
+        public string reverseNumber(Int32 number)
+        {
+            return new string(number.ToString().ToCharArray().Reverse().ToArray());
         }
     }
 
@@ -102,22 +117,16 @@ namespace Integer_To_English_Word
             {15, "fifteen"}, {16, "sixteen"}, {17, "seventeen"}, {18, "eighteen"}, {19, "nineteen"}
         };
 
-        public StandardDictionaryNumbers(Int32 signedNumber)
+        //  Name:
+        //  Purpose:
+        //  Description:
+        public StandardDictionaryNumbers(string number, int sign, int length, Int32 numberInt)
         {
-            string numberStringReversed = new string(signedNumber.ToString().ToCharArray().Reverse().ToArray());
-            int sign = Math.Sign(signedNumber);
-            int numberLength = sign >= 0 ? signedNumber.ToString().Length : signedNumber.ToString().Length - 1;
-
-
-            // Formats the reversed number string such that its length becomes a multiple of 3.
-            formatNumberLength(ref numberStringReversed, sign, ref numberLength);
-
-            for (int i = 0; i < numberLength; i++)
+            for (int i = 0; i < length; i++)
             {
-                if (signedNumber == 0)
+                if (numberInt == 0)
                 {
                     englishNumber.Add(numberDictionary[0]);
-
                     break;
                 }
 
@@ -125,9 +134,9 @@ namespace Integer_To_English_Word
                 // portion of the overall number. 
                 if ((i + 1) % 3 == 0)
                 {
-                    Int32 onesDigit = Int32.Parse(numberStringReversed[i - 2].ToString());
-                    Int32 tensDigit = Int32.Parse(numberStringReversed[i - 1].ToString());
-                    Int32 hundredsDigit = Int32.Parse(numberStringReversed[i].ToString());
+                    Int32 onesDigit = Int32.Parse(number[i - 2].ToString());
+                    Int32 tensDigit = Int32.Parse(number[i - 1].ToString());
+                    Int32 hundredsDigit = Int32.Parse(number[i].ToString());
 
 
                     if (onesDigit != 0 || tensDigit != 0 || hundredsDigit != 0)
@@ -135,38 +144,47 @@ namespace Integer_To_English_Word
                         addPlaceValue(i);
                     }
 
+                    createDoubleDigitNumber(onesDigit, tensDigit);
+
                     if (hundredsDigit > 0)
                     {
-                        createDoubleDigitNumber(onesDigit, tensDigit);
-
                         englishNumber.Add(hundredsDictionary[3]);
-
                         englishNumber.Add(numberDictionary[hundredsDigit]);
-
-                    }
-                    else if (hundredsDigit == 0)
-                    {
-                        createDoubleDigitNumber(onesDigit, tensDigit);
                     }
                 }
             }
 
+            // Apply the negative sign if we have a negative number.
             isNegative(sign);
+        }
 
-            foreach (var item in englishNumber)
+        //  Name:
+        //  Purpose:
+        //  Description:
+        public void displayEnglishNumber()
+        {
+            englishNumber.Reverse();
+
+            foreach (var word in englishNumber)
             {
-                Console.WriteLine(item);
+                Console.Write(word + " ");
             }
         }
 
+        //  Name:
+        //  Purpose:
+        //  Description:
         private void isNegative(int sign)
         {
             if (sign < 0)
             {
-                englishNumber.Add("negative ");
+                englishNumber.Add("negative");
             }
         }
 
+        //  Name:
+        //  Purpose:
+        //  Description:
         private void createDoubleDigitNumber(int onesDigit, int tensDigit)
         {
             if (tensDigit > 1)
@@ -189,24 +207,10 @@ namespace Integer_To_English_Word
                 englishNumber.Add(numberDictionary[onesDigit]);
             }
         }
-
-        private static void formatNumberLength(ref string numberStringReversed, int sign, ref int numberLength)
-        {
-            while (numberLength % 3 != 0)
-            {
-                if (sign >= 0)
-                {
-                    numberStringReversed = numberStringReversed.Insert(numberStringReversed.Length, "0");
-                    numberLength = numberStringReversed.Length;
-                }
-                else if (sign < 0)
-                {
-                    numberStringReversed = numberStringReversed.Insert(numberStringReversed.Length - 1, "0");
-                    numberLength = numberStringReversed.Length - 1;
-                }
-            }
-        }
-
+     
+        //  Name:
+        //  Purpose:
+        //  Description:
         private void addPlaceValue(int i)
         {
             if (i != 2)
@@ -214,96 +218,5 @@ namespace Integer_To_English_Word
                 englishNumber.Add(hundredsDictionary[i + 1]);
             }
         }
-    }
-
-    /*
-    class StandardDictionaryNumbers
-    {
-        
-        private string[] placeValue = { 
-                                        "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety", "hundred",
-                                        "thousand", "million", "billion", "trillion", "quadrillion", "quintillion", 
-                                        "sextillion", "septillion", "octillion", "nonillion", "decillion", "undecillion", 
-                                        "duodecillion", "tredecillion", "quattuordecillion", "quindecillion", "sexdecillion", "septendecillion", 
-                                        "octodecillion", "novemdecillion", "vigintillion", "centillion"
-        };
-        
-        char tensPlaceValue = ' ';
-        public bool isNegative = false;
-
-        private string[] placeValue = {"thousand", "hundred", "tens", "ones"};
-
-        
-        private Dictionary<string, string> NumberEnglishEquivalencies = new Dictionary<string, string> {
-            {"0", "zero"}, {"1","one"}, {"2", "two"}, {"3", "three"}, {"4", "four"}, {"5", "five"}, {"6", "six"}, {"7", "seven"}, {"8", "eight"}, {"9", "nine"},
-            {"10", "ten"}, {"11", "eleven"}, {"12", "twelve"}, {"13", "thirteen"}, {"14", "fourteen"}, {"15", "fifteen"}, {"16", "sixteen"}, {"17", "seventeen"},
-            {"18", "eighteen"}, {"19", "nineteen"}, {"20", "twenty"}
-        };
-
-        private Dictionary<string, string> TensPlaceEquivalencies = new Dictionary<string, string> {
-            {"2", "twenty"}, {"3", "thirty"}, {"4", "forty"}, {"5", "fifty"}, {"6", "sixty"}, {"7", "seventy"}, {"8", "eighty"}, {"9", "ninety"}
-        };
-
-
-        // A function which converts a digit to the appropriate english
-        // form depending on its place in the number. Example: "10" becomes "ten"
-        public string numberToEnglish(int digitPlace, int size, char number)
-        {
-            // Finds the place in relation to the size of the number.
-            int place = digitPlace + (placeValue.Length - size);
-
-
-            if (size > 1 && !number.Equals('0'))
-            {
-                // If in the tens place, store the value in that spot for later if 1.
-                // Otherwise, return a string fragment of the corresponding naming convention.
-                // Example: "2" will return "twenty".   
-                if (placeValue[place] == "tens")
-                {
-                    if (number.Equals('1'))
-                    {
-                        tensPlaceValue = number;
-                    }
-                    else
-                    {
-                        return TensPlaceEquivalencies[number.ToString()];
-                    }
-                }
-                // If in the ones place, return a string fragment of the corresponding number between 10-19 by 
-                // combining the tens and ones place numbers. Otherwise, return a string fragment of the corresponding ones place value.
-                // Example: "15" will return "fifteen" and "5" will return "five".
-                else if (placeValue[place] == "ones")
-                {
-                    if (tensPlaceValue.Equals('1'))
-                    {
-                        return NumberEnglishEquivalencies[tensPlaceValue.ToString() + number.ToString()];
-                    }
-                    else
-                    {
-                        return NumberEnglishEquivalencies[number.ToString()] + " ";
-                    }
-                }
-                // Returns the corresponding number naming conventions for the hundreds and thousands place.
-                else
-                {
-                    return NumberEnglishEquivalencies[number.ToString()] + " " + placeValue[place];
-                }
-            }
-            // Special case for catching single digit numbers or single digit negative numbers.
-            else if (size == 1 || (size == 2 && isNegative))
-            {
-                return NumberEnglishEquivalencies[number.ToString()];
-            }
-            // Special case for catching the number 10.
-            else if (tensPlaceValue.Equals('1'))
-            {
-                return NumberEnglishEquivalencies[tensPlaceValue.ToString() + number.ToString()];
-            }
-
-            return "";
-        }
-        
-    }
-    */
-    
+    }    
 }
