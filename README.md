@@ -4,6 +4,6 @@ A program which takes an integer, converts it to word form, and then outputs it 
 
 # How To Run
 For normal use of the program, type into PowerShell: "<b>dotnet run <number></b>"
-<b>Example:</b> dotnet run 5
+<li><b>Example:</b> dotnet run 5</li>
 
 For running the unit tests, type into PowerShell: "<b>dotnet test</b>"
