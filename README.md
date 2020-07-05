@@ -3,7 +3,7 @@ A program which takes an integer, converts it to word form, and then outputs it 
 
 
 ### How To Run
-For normal use of the program, type into PowerShell: "<b>dotnet run <number></b>"
+For normal use of the program, type into PowerShell: "<b>dotnet run [number]</b>"
 <li><b>Example:</b> dotnet run 5</li>
 
 ### How To Run Unit Tests
